@@ -1,6 +1,7 @@
 # Project Meathead - AI Assistant Guide
 
 ## Commands
+
 - Build: `pnpm build`
 - Development: `pnpm dev` (with Turbopack)
 - Lint: `pnpm lint`
@@ -8,6 +9,7 @@
 - Database: `pnpm db:generate`, `pnpm db:migrate`
 
 ## Code Style
+
 - Next.js 15 App Router with TypeScript
 - Use `@/` imports for src directory (`@/components/Button`)
 - React 19 functional components with TypeScript
@@ -21,4 +23,5 @@
 - Font variables: `--font-geist-sans`, `--font-geist-mono`
 
 ## Testing
+
 Currently no test framework configured - check with user before adding tests.

@@ -1,6 +1,7 @@
 # Project Meathead - AI Assistant Guide
 
 ## Commands
+
 - Build: `pnpm build`
 - Development: `pnpm dev` (with Turbopack)
 - Lint: `pnpm lint`
@@ -8,6 +9,7 @@
 - Database: `pnpm db:generate`, `pnpm db:migrate`
 
 ## Code Style
+
 - Next.js 15 App Router with TypeScript and React 19
 - Use `@/` imports for src directory (`@/components/Button`)
 - Functional components with TypeScript, export default for pages/layouts
@@ -21,4 +23,6 @@
 - ESLint extends next/core-web-vitals and next/typescript
 
 ## Testing
+
 Currently no test framework configured - check with user before adding tests.
+
