@@ -1,13 +1,13 @@
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
-import * as testSchema from "@/lib/schemas/tests";
+import { neon } from '@neondatabase/serverless'
+import { drizzle } from 'drizzle-orm/neon-http'
+import * as protypeSchema from '@/lib/schemas'
 
-const sql = neon(process.env.DATABASE_URL!);
+const sql = neon(process.env.DATABASE_URL!)
 
 const schema = {
-  ...testSchema,
-};
+  ...protypeSchema,
+}
 
-const db = drizzle(sql, { schema });
+const db = drizzle(sql, { schema })
 
-export { db };
+export { db }
