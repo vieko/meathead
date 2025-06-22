@@ -1,35 +1,49 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import type { Metadata } from 'next'
+import { Oxanium, Lora, Space_Mono } from 'next/font/google'
+import { ThemeProvider } from '@/components/theme-provider'
+import './globals.css'
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const oxaniumSans = Oxanium({
+  variable: '--font-oxanium',
+  subsets: ['latin'],
+})
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const loraSerif = Lora({
+  variable: '--font-lora',
+  subsets: ['latin'],
+})
+
+const spaceMono = Space_Mono({
+  weight: '400',
+  variable: '--font-space-mono',
+  subsets: ['latin'],
+})
 
 export const metadata: Metadata = {
-  title: "Project Meathead",
+  title: 'Project Meathead',
   description:
-    "A training program designed to plan, track and optimize your meathead goals",
-};
+    'A training program designed to plan, track and optimize your meathead goals',
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${oxaniumSans.variable} ${loraSerif.variable} ${spaceMono.variable}`}
       >
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
-  );
+  )
 }
