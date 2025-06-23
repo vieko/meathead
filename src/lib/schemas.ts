@@ -130,6 +130,7 @@ export const cycleDayMuscleGroups = pgTable('cycle_day_muscle_groups', {
   exerciseType: exerciseTypeEnum('exercise_type').notNull(),
   exerciseId: integer('exercise_id').references(() => exercises.id),
   order: integer('order').notNull(),
+  pinnedNotes: text('pinned_notes'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 })
 
@@ -168,7 +169,6 @@ export const workoutExercises = pgTable('workout_exercises', {
   order: integer('order').notNull(),
   setMethod: setMethodEnum('set_method').default('straight_sets').notNull(),
   notes: text('notes'),
-  pinnedNotes: text('pinned_notes'),
   isSkipped: boolean('is_skipped').default(false).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 })

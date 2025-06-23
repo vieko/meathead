@@ -65,6 +65,7 @@ erDiagram
         exercise_type exercise_type
         integer exercise_id FK
         integer order
+        text pinned_notes
         timestamp created_at
     }
     
@@ -93,7 +94,6 @@ erDiagram
         integer order
         set_method set_method
         text notes
-        text pinned_notes
         boolean is_skipped
         timestamp created_at
     }
