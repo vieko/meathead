@@ -21,6 +21,8 @@
 
 - There are two types of weeks: progression and deload
 
+- Exercises have a name, a muscle group, an exercise type, and a description
+
 - There are different types of muscle groups: chest, back, triceps, biceps,
   shoulders, quads, glutes, hamstrings, calves, traps, forearms, abs
 

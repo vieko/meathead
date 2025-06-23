@@ -1,11 +1,13 @@
 import { neon } from '@neondatabase/serverless'
 import { drizzle } from 'drizzle-orm/neon-http'
-import * as protypeSchema from '@/lib/schemas'
+import * as prototypeAmpSchema from '@/lib/schemas-amp'
+import * as prototypeOpencodeSchema from '@/lib/schemas-opencode'
 
 const sql = neon(process.env.DATABASE_URL!)
 
 const schema = {
-  ...protypeSchema,
+  ...prototypeAmpSchema,
+  ...prototypeOpencodeSchema,
 }
 
 const db = drizzle(sql, { schema })
