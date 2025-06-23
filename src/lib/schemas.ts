@@ -1,12 +1,12 @@
 import {
   pgTable,
-  uuid,
+  serial,
   text,
   integer,
-  timestamp,
-  boolean,
-  pgEnum,
   decimal,
+  boolean,
+  timestamp,
+  pgEnum,
 } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 
@@ -46,8 +46,6 @@ export const setMethodEnum = pgEnum('set_method', [
   'drop_sets',
 ])
 
-export const weekTypeEnum = pgEnum('week_type', ['progression', 'deload'])
-
 export const dayLabelEnum = pgEnum('day_label', [
   'monday',
   'tuesday',
@@ -58,9 +56,11 @@ export const dayLabelEnum = pgEnum('day_label', [
   'sunday',
 ])
 
+export const weekTypeEnum = pgEnum('week_type', ['progression', 'deload'])
+
 // Tables
 export const exercises = pgTable('exercises', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: serial('id').primaryKey(),
   name: text('name').notNull(),
   muscleGroup: muscleGroupEnum('muscle_group').notNull(),
   exerciseType: exerciseTypeEnum('exercise_type').notNull(),
@@ -70,60 +70,86 @@ export const exercises = pgTable('exercises', {
 })
 
 export const templates = pgTable('templates', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: serial('id').primaryKey(),
   name: text('name').notNull(),
+  description: text('description'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
 
+export const templateDays = pgTable('template_days', {
+  id: serial('id').primaryKey(),
+  templateId: integer('template_id')
+    .references(() => templates.id, { onDelete: 'cascade' })
+    .notNull(),
+  dayLabel: dayLabelEnum('day_label').notNull(),
+  order: integer('order').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+})
+
+export const templateDayMuscleGroups = pgTable('template_day_muscle_groups', {
+  id: serial('id').primaryKey(),
+  templateDayId: integer('template_day_id')
+    .references(() => templateDays.id, { onDelete: 'cascade' })
+    .notNull(),
+  muscleGroup: muscleGroupEnum('muscle_group').notNull(),
+  exerciseType: exerciseTypeEnum('exercise_type').notNull(),
+  exerciseId: integer('exercise_id').references(() => exercises.id),
+  order: integer('order').notNull(),
+  pinnedNotes: text('pinned_notes'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+})
+
 export const cycles = pgTable('cycles', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: serial('id').primaryKey(),
   name: text('name').notNull(),
-  templateId: uuid('template_id').references(() => templates.id),
+  templateId: integer('template_id').references(() => templates.id),
   currentWeek: integer('current_week').default(1).notNull(),
+  totalWeeks: integer('total_weeks').default(8).notNull(), // 7 progression + 1 deload
   isActive: boolean('is_active').default(false).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
 
 export const cycleDays = pgTable('cycle_days', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  cycleId: uuid('cycle_id')
+  id: serial('id').primaryKey(),
+  cycleId: integer('cycle_id')
     .references(() => cycles.id, { onDelete: 'cascade' })
     .notNull(),
   dayLabel: dayLabelEnum('day_label').notNull(),
-  dayOrder: integer('day_order').notNull(),
+  order: integer('order').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 })
 
-export const cycleMuscleGroups = pgTable('cycle_muscle_groups', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  cycleDayId: uuid('cycle_day_id')
+export const cycleDayMuscleGroups = pgTable('cycle_day_muscle_groups', {
+  id: serial('id').primaryKey(),
+  cycleDayId: integer('cycle_day_id')
     .references(() => cycleDays.id, { onDelete: 'cascade' })
     .notNull(),
   muscleGroup: muscleGroupEnum('muscle_group').notNull(),
   exerciseType: exerciseTypeEnum('exercise_type').notNull(),
-  exerciseId: uuid('exercise_id').references(() => exercises.id),
-  groupOrder: integer('group_order').notNull(),
+  exerciseId: integer('exercise_id').references(() => exercises.id),
+  order: integer('order').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 })
 
 export const weeks = pgTable('weeks', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  cycleId: uuid('cycle_id')
+  id: serial('id').primaryKey(),
+  cycleId: integer('cycle_id')
     .references(() => cycles.id, { onDelete: 'cascade' })
     .notNull(),
   weekNumber: integer('week_number').notNull(),
   weekType: weekTypeEnum('week_type').notNull(),
+  isCompleted: boolean('is_completed').default(false).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 })
 
 export const workouts = pgTable('workouts', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  weekId: uuid('week_id')
+  id: serial('id').primaryKey(),
+  weekId: integer('week_id')
     .references(() => weeks.id, { onDelete: 'cascade' })
     .notNull(),
-  cycleDayId: uuid('cycle_day_id')
+  cycleDayId: integer('cycle_day_id')
     .references(() => cycleDays.id)
     .notNull(),
   isCompleted: boolean('is_completed').default(false).notNull(),
@@ -132,14 +158,14 @@ export const workouts = pgTable('workouts', {
 })
 
 export const workoutExercises = pgTable('workout_exercises', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  workoutId: uuid('workout_id')
+  id: serial('id').primaryKey(),
+  workoutId: integer('workout_id')
     .references(() => workouts.id, { onDelete: 'cascade' })
     .notNull(),
-  exerciseId: uuid('exercise_id')
+  exerciseId: integer('exercise_id')
     .references(() => exercises.id)
     .notNull(),
-  exerciseOrder: integer('exercise_order').notNull(),
+  order: integer('order').notNull(),
   setMethod: setMethodEnum('set_method').default('straight_sets').notNull(),
   notes: text('notes'),
   pinnedNotes: text('pinned_notes'),
@@ -148,12 +174,12 @@ export const workoutExercises = pgTable('workout_exercises', {
 })
 
 export const sets = pgTable('sets', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  workoutExerciseId: uuid('workout_exercise_id')
+  id: serial('id').primaryKey(),
+  workoutExerciseId: integer('workout_exercise_id')
     .references(() => workoutExercises.id, { onDelete: 'cascade' })
     .notNull(),
   setNumber: integer('set_number').notNull(),
-  weight: decimal('weight', { precision: 5, scale: 2 }),
+  weight: decimal('weight', { precision: 6, scale: 2 }),
   reps: integer('reps'),
   isCompleted: boolean('is_completed').default(false).notNull(),
   isSkipped: boolean('is_skipped').default(false).notNull(),
@@ -163,13 +189,37 @@ export const sets = pgTable('sets', {
 
 // Relations
 export const exercisesRelations = relations(exercises, ({ many }) => ({
-  cycleMuscleGroups: many(cycleMuscleGroups),
+  cycleDayMuscleGroups: many(cycleDayMuscleGroups),
+  templateDayMuscleGroups: many(templateDayMuscleGroups),
   workoutExercises: many(workoutExercises),
 }))
 
 export const templatesRelations = relations(templates, ({ many }) => ({
   cycles: many(cycles),
+  templateDays: many(templateDays),
 }))
+
+export const templateDaysRelations = relations(templateDays, ({ one, many }) => ({
+  template: one(templates, {
+    fields: [templateDays.templateId],
+    references: [templates.id],
+  }),
+  muscleGroups: many(templateDayMuscleGroups),
+}))
+
+export const templateDayMuscleGroupsRelations = relations(
+  templateDayMuscleGroups,
+  ({ one }) => ({
+    templateDay: one(templateDays, {
+      fields: [templateDayMuscleGroups.templateDayId],
+      references: [templateDays.id],
+    }),
+    exercise: one(exercises, {
+      fields: [templateDayMuscleGroups.exerciseId],
+      references: [exercises.id],
+    }),
+  }),
+)
 
 export const cyclesRelations = relations(cycles, ({ one, many }) => ({
   template: one(templates, {
@@ -185,19 +235,19 @@ export const cycleDaysRelations = relations(cycleDays, ({ one, many }) => ({
     fields: [cycleDays.cycleId],
     references: [cycles.id],
   }),
-  cycleMuscleGroups: many(cycleMuscleGroups),
+  muscleGroups: many(cycleDayMuscleGroups),
   workouts: many(workouts),
 }))
 
-export const cycleMuscleGroupsRelations = relations(
-  cycleMuscleGroups,
+export const cycleDayMuscleGroupsRelations = relations(
+  cycleDayMuscleGroups,
   ({ one }) => ({
     cycleDay: one(cycleDays, {
-      fields: [cycleMuscleGroups.cycleDayId],
+      fields: [cycleDayMuscleGroups.cycleDayId],
       references: [cycleDays.id],
     }),
     exercise: one(exercises, {
-      fields: [cycleMuscleGroups.exerciseId],
+      fields: [cycleDayMuscleGroups.exerciseId],
       references: [exercises.id],
     }),
   }),
@@ -220,7 +270,7 @@ export const workoutsRelations = relations(workouts, ({ one, many }) => ({
     fields: [workouts.cycleDayId],
     references: [cycleDays.id],
   }),
-  workoutExercises: many(workoutExercises),
+  exercises: many(workoutExercises),
 }))
 
 export const workoutExercisesRelations = relations(
@@ -244,3 +294,4 @@ export const setsRelations = relations(sets, ({ one }) => ({
     references: [workoutExercises.id],
   }),
 }))
+
