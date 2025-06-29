@@ -43,6 +43,13 @@
       "when": 1751159418223,
       "tag": "0005_slippery_white_tiger",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1751159552866,
+      "tag": "0006_amusing_blazing_skull",
+      "breakpoints": true
     }
   ]
 }

@@ -182,6 +182,8 @@ export const workoutExercises = pgTable('workout_exercises', {
   exerciseId: integer('exercise_id')
     .references(() => exercises.id)
     .notNull(),
+  plannedExerciseId: integer('planned_exercise_id')
+    .references(() => exercises.id), // Original planned exercise before replacement
   order: integer('order').notNull(),
   setMethod: setMethodEnum('set_method').default('straight_sets').notNull(),
   notes: text('notes'),
@@ -316,6 +318,10 @@ export const workoutExercisesRelations = relations(
     }),
     exercise: one(exercises, {
       fields: [workoutExercises.exerciseId],
+      references: [exercises.id],
+    }),
+    plannedExercise: one(exercises, {
+      fields: [workoutExercises.plannedExerciseId],
       references: [exercises.id],
     }),
     sets: many(sets),
