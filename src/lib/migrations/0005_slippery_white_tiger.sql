@@ -1,0 +1,1 @@
+ALTER TABLE "weeks" ADD COLUMN "rir_recommendation" integer;
