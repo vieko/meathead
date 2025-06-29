@@ -156,6 +156,7 @@ export const weeks = pgTable('weeks', {
     .notNull(),
   weekNumber: integer('week_number').notNull(),
   weekType: weekTypeEnum('week_type').notNull(),
+  rirRecommendation: integer('rir_recommendation'), // RIR value for progression weeks, NULL for deload
   isCompleted: boolean('is_completed').default(false).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 })
