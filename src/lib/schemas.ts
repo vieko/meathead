@@ -199,6 +199,7 @@ export const sets = pgTable('sets', {
   setNumber: integer('set_number').notNull(),
   weight: decimal('weight', { precision: 6, scale: 2 }),
   reps: integer('reps'),
+  setMethod: setMethodEnum('set_method'), // NULL = inherit from workout_exercise, value = override
   isCompleted: boolean('is_completed').default(false).notNull(),
   isSkipped: boolean('is_skipped').default(false).notNull(),
   completedAt: timestamp('completed_at'),
