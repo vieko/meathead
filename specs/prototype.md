@@ -1,23 +1,32 @@
 ## Data Model
 
+- The app knows the name, email address of the user
+- Users own cycles, templates, and custom exercises
+- Users own their own workouts
+
 - Cycles contain days of the week
 - Each day contains muscle groups
 - Each muscle group contains one exercise of the given type
 
 - Cycles progress through a series of weeks
+- Each cycle can must have at least 3 progression weeks
 - Each cycle can have up to seven progression weeks
 - Each cycle requires one deload week as the last week
+- Each cycle has RIR (reps in reserve) recommendations for each week
 - Each week has a workout for every day in the cycle
 - Each workout has sets for each exercise in the day
 - Each set logs the number of reps at a given weight for each exercise
-- Each set is performed in a given method, the default being straight sets
+- Each set is performed in a given method (e.g. straight set, drop set), which
+  can be changed from the default for any given set
 
 - A template records the structure of a cycle: days, groups, exercises, pinned
   notes
 
 - When planning a cycle, the user outlines the structure of the cycle
 - When creating a cycle, the app generates all weeks, workouts, and sets for the
-  cycle
+  PLANNED cycle
+- The user progresses through the cycle logging one set at a time as the
+  RECORDED cycle
 
 - There are two types of weeks: progression and deload
 
@@ -34,6 +43,14 @@
 
 - There are seven labels for days: monday, tuesday, wednesday, thursday, friday,
   saturday, and sunday
+
+## RIR Recommendation Progression
+
+- 8 weeks: 3, 3, 2, 2, 1, 1, 0, 8
+- 7 weeks: 3, 3, 2, 2, 1, 0, 8
+- 6 weeks: 3, 2, 2, 1, 0, 8
+- 5 weeks: 3, 2, 1, 0, 8
+- 4 weeks: 2, 1, 0, 8
 
 ## Cycle Planning
 
@@ -61,11 +78,13 @@
 - Notes can be applied to the exercise for the current day only
 - User can reorder exercises
 - User can replace an exercise with a new one
+- When an exercise is replaced, the original planned exercise is recorded for
+  future reference.
 - User can add a set to an exercise
 - User can remove a set from an exercise
 - User can skip a set (a single set in an exercise)
 - User can skip sets (all sets in an exercise)
-- User can change the set type for an exercise
+- User can change the set type for a set
 
 - User enters weight for an exercise
 - User can update the weight for an exercise

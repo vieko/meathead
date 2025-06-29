@@ -59,12 +59,21 @@ export const dayLabelEnum = pgEnum('day_label', [
 export const weekTypeEnum = pgEnum('week_type', ['progression', 'deload'])
 
 // Tables
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  email: text('email').notNull().unique(),
+  name: text('name').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+})
+
 export const exercises = pgTable('exercises', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
   muscleGroup: muscleGroupEnum('muscle_group').notNull(),
   exerciseType: exerciseTypeEnum('exercise_type').notNull(),
   description: text('description'),
+  userId: integer('user_id').references(() => users.id), // NULL = system exercise, non-NULL = custom exercise
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
@@ -73,6 +82,9 @@ export const templates = pgTable('templates', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
   description: text('description'),
+  userId: integer('user_id')
+    .references(() => users.id, { onDelete: 'cascade' })
+    .notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
@@ -104,6 +116,9 @@ export const cycles = pgTable('cycles', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
   templateId: integer('template_id').references(() => templates.id),
+  userId: integer('user_id')
+    .references(() => users.id, { onDelete: 'cascade' })
+    .notNull(),
   currentWeek: integer('current_week').default(1).notNull(),
   totalWeeks: integer('total_weeks').default(8).notNull(), // 7 progression + 1 deload
   isActive: boolean('is_active').default(false).notNull(),
@@ -188,13 +203,27 @@ export const sets = pgTable('sets', {
 })
 
 // Relations
-export const exercisesRelations = relations(exercises, ({ many }) => ({
+export const usersRelations = relations(users, ({ many }) => ({
+  templates: many(templates),
+  cycles: many(cycles),
+  exercises: many(exercises),
+}))
+
+export const exercisesRelations = relations(exercises, ({ one, many }) => ({
+  user: one(users, {
+    fields: [exercises.userId],
+    references: [users.id],
+  }),
   cycleDayMuscleGroups: many(cycleDayMuscleGroups),
   templateDayMuscleGroups: many(templateDayMuscleGroups),
   workoutExercises: many(workoutExercises),
 }))
 
-export const templatesRelations = relations(templates, ({ many }) => ({
+export const templatesRelations = relations(templates, ({ one, many }) => ({
+  user: one(users, {
+    fields: [templates.userId],
+    references: [users.id],
+  }),
   cycles: many(cycles),
   templateDays: many(templateDays),
 }))
@@ -222,6 +251,10 @@ export const templateDayMuscleGroupsRelations = relations(
 )
 
 export const cyclesRelations = relations(cycles, ({ one, many }) => ({
+  user: one(users, {
+    fields: [cycles.userId],
+    references: [users.id],
+  }),
   template: one(templates, {
     fields: [cycles.templateId],
     references: [templates.id],
